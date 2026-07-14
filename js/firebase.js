@@ -1,4 +1,3 @@
-// ── FIREBASE INIT ─────────────────────────────────────
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
@@ -16,15 +15,17 @@ const firebaseConfig = {
   measurementId: "G-89KMW1C9KG"
 };
 
-const app = initializeApp(firebaseConfig);
+const app  = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db   = getFirestore(app);
 
-// ── AUTH HELPERS ──────────────────────────────────────
+// Disable reCAPTCHA Enterprise — fixes 400 Bad Request on login
+auth.settings = auth.settings || {};
+auth.settings.appVerificationDisabledForTesting = false;
 
+// ── AUTH HELPERS ──────────────────────────────────────
 export async function signUp(email, password, username) {
   const cred = await createUserWithEmailAndPassword(auth, email, password);
-  // Save extra user info to Firestore
   await setDoc(doc(db, "users", cred.user.uid), {
     username,
     email,
@@ -43,10 +44,8 @@ export async function logOut() {
 }
 
 // ── ORDERS ────────────────────────────────────────────
-
 export async function saveOrder(userId, cart, total, customerDetails) {
-  const ordersRef = collection(db, "orders");
-  await addDoc(ordersRef, {
+  await addDoc(collection(db, "orders"), {
     userId,
     customerDetails,
     items: cart,
@@ -57,7 +56,6 @@ export async function saveOrder(userId, cart, total, customerDetails) {
 }
 
 // ── AUTH STATE LISTENER ───────────────────────────────
-// Call this on every page to react to login/logout
 export function watchAuth(callback) {
   onAuthStateChanged(auth, callback);
 }

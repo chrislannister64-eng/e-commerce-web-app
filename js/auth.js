@@ -1,4 +1,22 @@
-import { signUp, logIn, logOut, watchAuth } from "./firebase.js";
+import { signUp, logIn, watchAuth } from "./firebase.js";
+
+function showToast(message, type = "info") {
+  function mount() {
+    let container = document.getElementById("toast-container");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "toast-container";
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add("show")));
+    setTimeout(() => { toast.classList.remove("show"); setTimeout(() => toast.remove(), 300); }, 2800);
+  }
+  document.body ? mount() : document.addEventListener("DOMContentLoaded", mount);
+}
 
 // ── SIGNUP ────────────────────────────────────────────
 const signupForm = document.getElementById("signup-form");
@@ -8,30 +26,17 @@ if (signupForm) {
     const username = document.getElementById("new-username").value.trim();
     const email    = document.getElementById("new-email").value.trim();
     const password = document.getElementById("new-password").value.trim();
-
-    if (!username || !email || !password) {
-      showToast("Please fill in all fields.", "error"); return;
-    }
-    if (password.length < 6) {
-      showToast("Password must be at least 6 characters.", "error"); return;
-    }
-
+    if (!username || !email || !password) { showToast("Please fill in all fields.", "error"); return; }
+    if (password.length < 6) { showToast("Password must be at least 6 characters.", "error"); return; }
     const btn = signupForm.querySelector("button[type=submit]");
-    btn.textContent = "Creating account...";
-    btn.disabled = true;
-
+    btn.textContent = "Creating account..."; btn.disabled = true;
     try {
       await signUp(email, password, username);
-      showToast("Account created! Welcome to Wheeze.", "success");
-      setTimeout(() => location.href = "wheeze.html", 1200);
+      showToast("Account created! Welcome to Wheeze 🎉", "success");
+      setTimeout(() => location.href = "index.html", 1500);
     } catch (err) {
-      btn.textContent = "Sign Up";
-      btn.disabled = false;
-      if (err.code === "auth/email-already-in-use") {
-        showToast("That email is already registered.", "error");
-      } else {
-        showToast(err.message, "error");
-      }
+      btn.textContent = "Sign Up"; btn.disabled = false;
+      showToast(err.code === "auth/email-already-in-use" ? "That email is already registered." : err.message, "error");
     }
   });
 }
@@ -43,54 +48,25 @@ if (loginForm) {
     e.preventDefault();
     const email    = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
-
-    if (!email || !password) {
-      showToast("Please fill in all fields.", "error"); return;
-    }
-
+    if (!email || !password) { showToast("Please fill in all fields.", "error"); return; }
     const btn = loginForm.querySelector("button[type=submit]");
-    btn.textContent = "Logging in...";
-    btn.disabled = true;
-
+    btn.textContent = "Logging in..."; btn.disabled = true;
     try {
-      await logIn(email, password);
-      showToast("Welcome back!", "success");
-      setTimeout(() => location.href = "wheeze.html", 1000);
+      const user = await logIn(email, password);
+      const username = user.email.split("@")[0];
+      localStorage.setItem("wheeze_username", username);
+      showToast(`Welcome back, ${username}! 👋`, "success");
+      setTimeout(() => location.href = "index.html", 1500);
     } catch (err) {
-      btn.textContent = "Login";
-      btn.disabled = false;
-      if (err.code === "auth/invalid-credential" || err.code === "auth/user-not-found") {
-        showToast("Invalid email or password.", "error");
-      } else {
-        showToast(err.message, "error");
-      }
+      btn.textContent = "Login"; btn.disabled = false;
+      showToast("Invalid email or password.", "error");
     }
   });
 }
 
-// ── LOGOUT (called from nav) ──────────────────────────
-window.logout = async function () {
-  await logOut();
-  localStorage.removeItem("cart");
-  location.href = "wheeze.html";
-};
-
-// ── NAV AUTH STATE ────────────────────────────────────
+// ── NAV STATE (login/signup pages only) ───────────────
 watchAuth((user) => {
-  const loginBtn  = document.getElementById("login-btn");
-  const signupBtn = document.getElementById("signup-btn");
-  const logoutBtn = document.getElementById("logout-btn");
-  const greeting  = document.getElementById("user-greeting");
-
-  if (user) {
-    if (loginBtn)  loginBtn.style.display  = "none";
-    if (signupBtn) signupBtn.style.display = "none";
-    if (logoutBtn) logoutBtn.style.display = "inline-flex";
-    if (greeting)  greeting.textContent    = `Hey, ${user.email.split("@")[0]} 👋`;
-  } else {
-    if (loginBtn)  loginBtn.style.display  = "inline-flex";
-    if (signupBtn) signupBtn.style.display = "inline-flex";
-    if (logoutBtn) logoutBtn.style.display = "none";
-    if (greeting)  greeting.textContent    = "";
+  if (user && (window.location.pathname.includes("login") || window.location.pathname.includes("signup"))) {
+    location.href = "index.html";
   }
 });

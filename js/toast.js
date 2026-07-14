@@ -1,22 +1,2 @@
-// ── TOAST ─────────────────────────────────────────────
-(function () {
-  if (!document.getElementById("toast-container")) {
-    const el = document.createElement("div");
-    el.id = "toast-container";
-    document.body.appendChild(el);
-  }
-})();
-
-window.showToast = function (message, type = "info") {
-  const container = document.getElementById("toast-container");
-  if (!container) return;
-  const toast = document.createElement("div");
-  toast.className = `toast toast-${type}`;
-  toast.textContent = message;
-  container.appendChild(toast);
-  requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add("show")));
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 300);
-  }, 2800);
-};
+// toast.js — kept as a no-op since showToast is now in each module
+// This file exists so existing script tags don't 404
