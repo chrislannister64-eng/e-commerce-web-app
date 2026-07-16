@@ -79,9 +79,9 @@ const products = [
   { id: 49, name: "Apple Watch",         price: 598500,  img: "product-images/apple-watch.webp",        category: "Electronics" },
   { id: 50, name: "Dell XPS 15",         price: 2173500, img: "product-images/dell-xps15.webp",         category: "Electronics" },
   { id: 51, name: "Nintendo Switch",     price: 448500,  img: "product-images/nintendo-switch.webp",    category: "Electronics" },
-  { id: 52, name: "PS5",                 price: 148500,  img: "product-images/ps5.avif",                category: "Electronics" },
+  { id: 52, name: "PS5",                 price: 948500,  img: "product-images/ps5.avif",                category: "Electronics" },
   { id: 53, name: "JBL Speaker",         price: 148500,  img: "product-images/JBL.webp",                category: "Electronics" },
-  { id: 54, name: "Canon Camera",        price: 748500,  img: "product-images/canon-camera.webp",       category: "Electronics" },
+  { id: 54, name: "Canon Camera",        price: 78500,  img: "product-images/canon-camera.webp",       category: "Electronics" },
   { id: 55, name: "Ring Light",          price: 37500,   img: "product-images/ring-light.webp",         category: "Electronics" },
   { id: 56, name: "Mechanical Keyboard", price: 112500,  img: "product-images/mechanical-keyboard.webp",category: "Electronics" },
 ];
